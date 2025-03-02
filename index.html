@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revenue Projection</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>Revenue Projection</h2>
+    <label for="scenario">Select Scenario:</label>
+    <select id="scenario" onchange="updateChart()">
+        <option value="0.15">Base (15%)</option>
+        <option value="0.20">Upside (20%)</option>
+        <option value="0.10">Downside (10%)</option>
+    </select>
+    <canvas id="revenueChart"></canvas>
+    
+    <script>
+        let baseRevenue = [100];
+        let labels = [1, 2, 3, 4, 5];
+        let growthRate = 0.15;
+        
+        function calculateRevenue(rate) {
+            let revenue = [100];
+            for (let i = 1; i < labels.length; i++) {
+                revenue.push(revenue[i - 1] * (1 + rate));
+            }
+            return revenue;
+        }
+        
+        let ctx = document.getElementById('revenueChart').getContext('2d');
+        let revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Projected Revenue',
+                    data: calculateRevenue(growthRate),
+                    borderColor: 'blue',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+        
+        function updateChart() {
+            let selectedRate = parseFloat(document.getElementById('scenario').value);
+            revenueChart.data.datasets[0].data = calculateRevenue(selectedRate);
+            revenueChart.update();
+        }
+    </script>
+</body>
+</html>
