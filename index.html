@@ -3,72 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Revenue Projection</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Interactive Graph</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/recharts/umd/Recharts.min.js"></script>
 </head>
 <body>
-    <!-- Scenario selection dropdown -->
-    <select id="scenario" onchange="updateChart()">
-        <option value="0.15">Base (15%)</option>
-        <option value="0.20">Upside (20%)</option>
-        <option value="0.10">Downside (10%)</option>
-    </select>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState } = React;
+        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = Recharts;
 
-    <!-- Chart canvas -->
-    <canvas id="revenueChart"></canvas>
+        const initialData = [
+            { date: "Jan", value1: 400, value2: 240 },
+            { date: "Feb", value1: 300, value2: 139 },
+            { date: "Mar", value1: 200, value2: 980 },
+            { date: "Apr", value1: 278, value2: 390 },
+            { date: "May", value1: 189, value2: 480 },
+            { date: "Jun", value1: 239, value2: 380 },
+            { date: "Jul", value1: 349, value2: 430 },
+        ];
 
-    <script>
-        // Defining the labels for the x-axis
-        var labels = [1, 2, 3, 4, 5];
+        function App() {
+            const [showValue2, setShowValue2] = useState(true);
 
-        // Getting the context of the canvas to draw the chart
-        var ctx = document.getElementById('revenueChart').getContext('2d');
-
-        // Creating the chart with initial settings
-        var chart = new Chart(ctx, {
-            type: 'line',  // Line chart type
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Projected Revenue',
-                    borderColor: 'blue',
-                    borderWidth: 2,
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-
-        // Function to calculate projected revenue based on growth rate
-        function calculateRevenue(rate) {
-            var revenue = [];
-            var initialRevenue = 100;
-
-            // Loop through the labels and calculate revenue for each period
-            for (var i = 0; i < labels.length; i++) {
-                revenue.push(initialRevenue * Math.pow(1 + rate, i));
-            }
-
-            return revenue;
+            return (
+                <div style={{ textAlign: "center", padding: "20px" }}>
+                    <h1>Interactive Graph</h1>
+                    <button onClick={() => setShowValue2(!showValue2)}>
+                        {showValue2 ? "Hide Value2" : "Show Value2"}
+                    </button>
+                    <ResponsiveContainer width="80%" height={400}>
+                        <LineChart data={initialData} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="date" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Line type="monotone" dataKey="value1" stroke="#8884d8" strokeWidth={2} />
+                            {showValue2 && <Line type="monotone" dataKey="value2" stroke="#82ca9d" strokeWidth={2} />}
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+            );
         }
 
-        // Function to update the chart with the selected scenario
-        function updateChart() {
-            var selectedRate = parseFloat(document.getElementById('scenario').value);
-            var newRevenue = calculateRevenue(selectedRate);
-
-            // Update the chart's data
-            chart.data.datasets[0].data = newRevenue;
-            chart.update();  // Redraw the chart
-        }
-
-        // Initialize the chart with the default scenario (Base 15%)
-        updateChart();
+        ReactDOM.createRoot(document.getElementById("root")).render(<App />);
     </script>
 </body>
 </html>
+
